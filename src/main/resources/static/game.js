@@ -212,7 +212,7 @@ function createWinnersTable() {
 	}
 	t += "</table>" +
 			'<div id="clear"><a href="javascript:showPassInput()">Clear Table</a></div>';
-	t += '<a href="javascript:PopUpHide()">Hide</a></div></div>';
+	t += '<a href="javascript:PopUpHide()">Close Table</a></div></div>';
 	element("winnersTable").innerHTML = t;
 }
 
