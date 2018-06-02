@@ -77,12 +77,14 @@ input, button {
 #yellow {
     background-color: yellow;
     color: #000;
+    font-size: 150%;
     padding: 3%;
 }
 
 #green {
     background-color: green;
     color: #fff;
+    font-size: 150%;
     padding: 3%;
 }
 

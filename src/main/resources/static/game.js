@@ -135,7 +135,7 @@ function createLogTable() {
 		t += "<td>" + g[i].guess.join("") + "</td>";
 		t += "<td>";   
 			for(let j = 0; j < g[i].result.length; j++) {
-				t += '<span id="' +(g[i].result[j] == 0? "yellow":"green")+ '">'+g[i].result[j]+'</span>'
+				t += '<span id="' +(g[i].result[j] == 0? "yellow":"green")+ '">o</span>'
 			}
 		t += "</td>";
 		t += "</tr>";
