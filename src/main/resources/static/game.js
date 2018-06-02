@@ -31,7 +31,7 @@ function initGame() {
 	
 	element("attempt").disabled = false;
 	element("attempt").value = '';
-	element("attempt").placeholder = "Enter your attempt ";
+	element("attempt").placeholder = "Guess 4-digits number";
 	
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
@@ -94,7 +94,7 @@ function checkMaxAttemps() {
 
 function checkNumber() {
 	if(element("attempt").value.length != 4 ) {
-		alert("Enter number 4 digits! " + element("attempt").value.length);
+		alert("Enter 4 digits number! Not a " + element("attempt").value.length + " digits!");
 		return;
 	}
 	var xhttp = new XMLHttpRequest();
@@ -184,7 +184,7 @@ function clearWinnersTable() {
 
 function showPassInput() {
 	if(!element("showAdminPass")) {
-		element("winnersTable").innerHTML += 
+		element("popup1").innerHTML += 
 			'<div id="showAdminPass"><input type="password" id="password" placeholder="Enter password "><button id="clearWinnersTable" onclick="clearWinnersTable()" class="addBtn">Submit</button></div>';
 	}
 }
@@ -194,7 +194,7 @@ function createWinnersTable() {
 		element("winnersTable").innerHTML = "<h1>No winners found !!</h1>";
 		return;
 	}
-	let t = "<table>";
+	let t = '<div class="b-popup" id="popup1"> <div class="b-popup-content">' + "<table>";
 	t += "<tr>";
 	t += "<th>Name</th>";
 	t += "<th>Attempts</th>";
@@ -211,10 +211,14 @@ function createWinnersTable() {
 		t += "</tr>";
 	}
 	t += "</table>" +
-			'<div id="clear"><button id="clear" onclick="showPassInput()" class="addBtn">Clear</button></div>';
+			'<div id="clear"><a href="javascript:showPassInput()">Clear Table</a></div>';
+	t += '<a href="javascript:PopUpHide()">Hide</a></div></div>';
 	element("winnersTable").innerHTML = t;
 }
 
+function PopUpHide() {
+	hide(element("popup1"));
+}
 function removeEvent(eventId) {
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
