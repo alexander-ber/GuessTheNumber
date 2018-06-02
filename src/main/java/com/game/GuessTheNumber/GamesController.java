@@ -3,6 +3,7 @@ package com.game.GuessTheNumber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,25 +24,31 @@ public class GamesController {
 		return services.getNewGameId();
 	}
 	
-	@GetMapping(value = "update-game-counter/{gameId}",  produces = "application/json")
-	public String updateGameCounter(@PathVariable("gameId") Integer gameId) {
-		return services.updateCounter(gameId);
-	}
+	@GetMapping(value = "get-game-details2/{gameId}",  produces = "application/json") // <--- Add parameter to request
+	public Game getGameDetails2(@PathVariable("gameId") Integer gameId) {
+		return services.getGameDetails(gameId);
+		//return services.getGameDetails(gameId);
+	}	
 	
 	@GetMapping(value = "get-game-details/{gameId}",  produces = "application/json") // <--- Add parameter to request
 	public Object getGameDetails(@PathVariable("gameId") Integer gameId) {
-		//return services.getGameDetails(gameId).toString();
-		return services.getGameDetails(gameId);
+		return services.getGameDetails(gameId).toString();
+		//return services.getGameDetails(gameId);
 	}	
 	
-	@GetMapping("set-gamer-name/{gameId}/{name}") // <--- Add parameter to request
+	@PostMapping("set-gamer-name/{gameId}/{name}") // <--- Add parameter to request
 	public Boolean setGamerName(@PathVariable("gameId") Integer gameId, @PathVariable("name") String name) {
 		return services.setGamerName(gameId, name);
 	}	
 
-	@GetMapping(value = "check-attemp/{gameId}/{attemp}", produces = "application/json") // <--- Add parameter to request
-	public Object checkAttemp(@PathVariable("gameId") Integer gameId, @PathVariable("attemp") String attemp) {
-		return services.checkAttemp(gameId, attemp);
+	@GetMapping(value = "check-attempt/{gameId}/{attempt}", produces = "application/json") // <--- Add parameter to request
+	public Game checkAttemp(@PathVariable("gameId") Integer gameId, @PathVariable("attempt") String attempt) {
+		return services.checkAttempt(gameId, attempt);
 	}
+	
+	@PostMapping(value = "clear-win-table/{password}",  produces = "application/json") // <--- Add parameter to request
+	public Boolean clearWinTable(@PathVariable("password") String password) {
+		return services.clearWinTable(password);
+	}	
 	
 }

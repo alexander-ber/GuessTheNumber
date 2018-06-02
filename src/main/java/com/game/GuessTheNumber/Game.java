@@ -1,12 +1,16 @@
 package com.game.GuessTheNumber;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Game {
 	private Integer userId;
 	private Integer attempsCounter;
 	private ArrayList<Integer> secretNumber;
+	private ArrayList<GameLog> gameLog;
 	private String userName;
+	private Boolean isWinner;
+	private Boolean isEnded;
 	
 	public String getUserName() {
 		return userName;
@@ -19,7 +23,7 @@ public class Game {
 	public ArrayList<Integer> checkAttemp(String attemp) {
 		ArrayList<Integer> result = new ArrayList<Integer>();
 		String[] strArray = attemp.split("");
-		for (int i = 0; i < strArray.length; i++) {
+		for (int i = 0; i < 4; i++) {
 			int ind = secretNumber.indexOf( Integer.parseInt(strArray[i]));
 			if(ind > -1 ) {
 				if(ind == i) {
@@ -29,6 +33,12 @@ public class Game {
 				}
 			}
 		}
+		
+		// convert string to List of integers
+		ArrayList<Integer> intList = new ArrayList<Integer>();
+		for(String s : strArray) intList.add(Integer.valueOf(s));
+		attempsCounter++;
+		this.gameLog.add(new GameLog(attempsCounter,intList,result));
 		return result;
 	}
 	
@@ -64,9 +74,37 @@ public class Game {
 
 	public Game(Integer userId, ArrayList<Integer> secretNumber, String userName) {
 		super();
-		this.attempsCounter = 0;
 		this.userId = userId;
+		this.attempsCounter = 0;
 		this.secretNumber = secretNumber;
+		this.gameLog = new ArrayList<GameLog>();
 		this.userName = userName;
+		this.isEnded = false;
+		this.isWinner = false;
+	}
+
+	public Boolean getIsEnded() {
+		return isEnded;
+	}
+
+	public void setIsEnded(Boolean isEnded) {
+		this.isEnded = isEnded;
+	}
+	
+
+	public Boolean getIsWinner() {
+		return isWinner;
+	}
+
+	public void setIsWinner(Boolean isWinner) {
+		this.isWinner = isWinner;
+	}
+
+	public ArrayList<GameLog> getGameLog() {
+		return gameLog;
+	}
+
+	public void setGameLog(ArrayList<GameLog> gameLog) {
+		this.gameLog = gameLog;
 	}
 }

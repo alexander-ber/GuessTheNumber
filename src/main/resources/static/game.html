@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Events handler</title>
+<script src="game.js" type="text/javascript"></script>
+<link href="game.css" rel="stylesheet">
+</head>
+<body onload="initGame()">
+	<div class="header">
+		<h2><span id="guessTxt">Guess</span><span id="theTxt"> the </span> <span id="numberTxt">Number</span></h2>
+	
+		<div id = "blockName">
+			<input type="text" id="name" placeholder="Enter your name, Anonymous">
+			<button id="addNameBtn" onclick="addName()" class="addBtn">Enter</button>
+		</div>
+		<div id = "blockNewGame">
+			<button id="newGame" onclick="initGame()" class="addBtn">Start a new game!</button>
+		</div>
+	</div>
+	
+	<div class="bodyGame">	
+		<div id = "rSide">	
+			<div id = "blockAttempt">
+				<input type="text" id="attempt" placeholder="Enter your attempt ">
+				<button id="check" onclick="checkNumber()" class="addBtn">Check number</button>
+			</div>
+		</div>
+		<div id = "lSide">
+			<div id="logTable" class="grid"></div>
+		</div>
+	</div>
+
+		<div id="winnersTable" class="grid">
+		
+	</div>
+</body>
+</html>

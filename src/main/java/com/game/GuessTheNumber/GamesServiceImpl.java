@@ -17,7 +17,8 @@ public class GamesServiceImpl implements GamesService {
 	
 	private AtomicInteger gameId = new AtomicInteger(100);
 	private HashMap<Integer, Game> hmap = new HashMap<Integer, Game>();
-	private final Integer maxAttemps = 20;
+	private final Integer maxAttemps = 10; //20
+	private final Integer maxWinners = 5; //10
 	private final String adminPass = "Nimda";
 	
 	public HashMap<Integer, Game> getHmap() {
@@ -33,13 +34,7 @@ public class GamesServiceImpl implements GamesService {
 	
 	@Override
 	public Iterable<Winners> getWinnersTable() {
-		return dao.findAll();
-	}
-	
-	@Override
-	public Integer addWinner(Integer w) {
-		//dao.save(w).getId();
-		return 1;
+		return dao.findTop10ByOrderByAttemptsAsc();
 	}
 	
 	@Override 
@@ -70,17 +65,19 @@ public class GamesServiceImpl implements GamesService {
 		return this.hmap.get(gameId);
 	}
 
-	@Override
-	public String updateCounter(Integer gameId) {		
+	protected boolean updateCounter(Integer gameId) {		
 		Game g = this.hmap.get(gameId);
 		Integer attempsCounter = g.getAttempsCounter();
 		attempsCounter++;
-		if(attempsCounter>maxAttemps) {
-			return "{'error': true; 'message': 'maximum attemps!'}";
+		
+		if(attempsCounter == this.maxAttemps) {
+			g.setIsEnded(true);
+			return false;
 		}
-		g.setAttempsCounter(attempsCounter+1);
+		
+		g.setAttempsCounter(attempsCounter);
 		this.hmap.put(gameId, g);
-		return "{'error': false;}";
+		return true;
 	}
 
 	@Override
@@ -93,20 +90,47 @@ public class GamesServiceImpl implements GamesService {
 	}
 
 	@Override
-	public Object checkAttemp(Integer gameId, String attemp) {
-		updateCounter(gameId);
+	public Game checkAttempt(Integer gameId, String attempt) {
 		Game g = this.hmap.get(gameId);
-		
-		ArrayList<Integer> result = g.checkAttemp(attemp); 
-		ArrayList<Integer> winnerResult =  new ArrayList<Integer>(){{add(1);add(1);add(1);add(1);}};
-		if(result.equals(winnerResult)) {
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			Date dateobj = new Date();
-			System.out.println(df.format(dateobj));
-			Winners w = new Winners(g.getUserName(), g.getAttempsCounter(), df.format(dateobj).toString());
-			dao.save(w);
+		if(!g.getIsEnded()) {
+			if (attempt.length() != 4) {
+				return g;
+			}
+			ArrayList<Integer> result = g.checkAttemp(attempt); 
+			ArrayList<Integer> winnerResult =  new ArrayList<Integer>(){{add(1);add(1);add(1);add(1);}};
+			
+			if(result.equals(winnerResult)) {
+				//check num rows in db, if = maxWinners, delete the bigger attempts user and that add new
+				int count = (int) dao.count();
+				if(count == this.maxWinners) {
+					dao.delete(dao.findFirstByOrderByAttemptsDesc());
+				}
+				// Add new row to DB
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				Date dateobj = new Date();
+				System.out.println(df.format(dateobj));
+				Winners w = new Winners(g.getUserName(), g.getAttempsCounter(), df.format(dateobj).toString());
+				dao.save(w);
+				g.setIsWinner(true);
+				g.setIsEnded(true);
+			}
+			
+			if(g.getAttempsCounter() == this.maxAttemps) {
+				g.setIsEnded(true);
+			}
+			
+			return g;
 		}
-		return result;
+		return g;
+	}
+
+	@Override
+	public Boolean clearWinTable(String password) {
+		if(password.equals(this.adminPass)) {
+			dao.deleteAll();
+			return true;
+		}
+		return false;
 	}
 
 }

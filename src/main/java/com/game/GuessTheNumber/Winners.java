@@ -17,6 +17,9 @@ public class Winners {
 	
 	private Integer attempts;
 	
+	@Column(name = "date")
+	private String gameDate;
+	
 	public Integer getAttempts() {
 		return attempts;
 	}
@@ -24,9 +27,6 @@ public class Winners {
 	public void setAttempts(Integer attempts) {
 		this.attempts = attempts;
 	}
-
-	@Column(name = "date")
-	private String gameDate;
 
 	public Winners() {
 		super();
