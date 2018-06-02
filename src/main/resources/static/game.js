@@ -72,6 +72,7 @@ function checkWinner() {
 	if( data.isWinner == true) {
 		alert("Congrats, " + data.userName + "! You are WIN from " + data.attempsCounter + " attemps!");
 		element("check").disabled = true;
+		element("attempt").disabled = true;
 		hide(element("check"));
 		element("name").disabled = true;
 		hide(element("addNameBtn"));
@@ -83,6 +84,7 @@ function checkMaxAttemps() {
 	if( data.isWinner == false && data.isEnded == true) {
 		alert("Sorry, " + data.userName + ", but you lost! Maximum " + data.attempsCounter + " attemps!");
 		element("check").disabled = true;
+		element("attempt").disabled = true;
 		hide(element("check"));
 		element("name").disabled = true;
 		hide(element("addNameBtn"));
@@ -157,6 +159,10 @@ function getWinnersTable() {
 }
 
 function clearWinnersTable() {
+	if(element("password").value == '') {
+		alert("Enter admin password to clean table!");
+		return;
+	}
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
@@ -164,9 +170,9 @@ function clearWinnersTable() {
 			if(JSON.parse(this.responseText) == true) {
 				element("winnersTable").innerHTML = "";
 				app.winners = [];
-				alert("Winners table cleared!");
+				alert("Winners table is cleared!");
 			} else {
-				alert("Wrong password");
+				alert("Wrong password!!");
 			}
 			createWinnersTable();
 		}
@@ -177,12 +183,12 @@ function clearWinnersTable() {
 }
 
 function showPassInput() {
-	
 	if(!element("showAdminPass")) {
 		element("winnersTable").innerHTML += 
 			'<div id="showAdminPass"><input type="password" id="password" placeholder="Enter password "><button id="clearWinnersTable" onclick="clearWinnersTable()" class="addBtn">Submit</button></div>';
 	}
 }
+
 function createWinnersTable() {
 	if (app.winners.length == 0) {
 		element("winnersTable").innerHTML = "<h1>No winners found !!</h1>";

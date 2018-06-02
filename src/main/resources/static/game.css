@@ -109,6 +109,12 @@ input, button {
     margin: 10px;
     float: right;
     font-size: 12px;
+    background-color: #61b4c4;
+}
+
+#addNameBtn:hover {
+	background-color: #c43f8e;
+	color: #fff;	
 }
 
 #newGame{
@@ -116,6 +122,15 @@ input, button {
 	font-size: 12px;
 	padding: 5px;
     margin: 10px;
+    background-color: #4326c4;
+}
+#newGame:hover{
+	width: 90%;
+	font-size: 12px;
+	padding: 5px;
+    margin: 10px;
+    color: #4326c4;
+    background-color: #61b4c4;
 }
 
 #bodyGame {
