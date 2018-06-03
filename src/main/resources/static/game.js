@@ -199,6 +199,7 @@ function createWinnersTable() {
 		+"<h3>Top Score Table</h3>"
 		+ "<table>";
 	t += "<tr>";
+	t += "<th>#</th>";
 	t += "<th>Name</th>";
 	t += "<th>Attempts</th>";
 	t += "<th>Date</th>";
@@ -206,14 +207,15 @@ function createWinnersTable() {
 	for (let i = 0; i < app.winners.length; i++) {
 		const winner = app.winners[i];
 		t += "<tr>";
+		t += "<td>" + (i+1) + "</td>";
 		t += "<td>" + winner.name + "</td>";
 		t += "<td>" + winner.attempts + "</td>";
 		t += "<td>" + winner.gameDate + "</td>";
 		t += "</tr>";
 	}
 	t += "</table>" +
-			'<div id="clear"><a href="javascript:showPassInput()">Clear Table</a></div>';
-	t += '<a href="javascript:PopUpHide()">Close Table</a></div></div>';
+			'<div id="clear"><a href="javascript:showPassInput()">Clear Table</a> | ';
+	t += '<a href="javascript:PopUpHide()">Close Table</a></div></div></div>';
 	element("winnersTable").innerHTML = t;
 }
 

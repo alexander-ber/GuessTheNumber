@@ -1,7 +1,6 @@
 package com.game.GuessTheNumber;
 
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Game {
 	private Integer userId;
@@ -18,6 +17,24 @@ public class Game {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	
+	public Game(Game g) {
+		this.userId = g.userId;
+		this.attempsCounter = g.attempsCounter;
+		this.gameLog = this.cloneArrayListGameLog(g.getGameLog()); 
+		this.userName = g.userName;
+		this.isWinner = g.isWinner;
+		this.isEnded = g.isEnded;
+	}
+	
+	protected ArrayList<GameLog> cloneArrayListGameLog(ArrayList<GameLog> glList) {
+		ArrayList<GameLog> clonedGlList = new ArrayList<GameLog>(glList.size());
+	    for (GameLog gl : glList) {
+	    	clonedGlList.add(new GameLog(gl));
+	    }
+	    return clonedGlList;
 	}
 
 	public ArrayList<Integer> checkAttemp(String attemp) {

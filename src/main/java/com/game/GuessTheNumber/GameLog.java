@@ -1,7 +1,6 @@
 package com.game.GuessTheNumber;
 
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class GameLog {
 	private Integer logID;
@@ -13,6 +12,13 @@ public class GameLog {
 		this.logID = logID;	
 		this.guess = guess;
 		this.result = result;
+	}
+	
+	//Copy c-tor
+	public GameLog(GameLog gl) {
+		this.logID = gl.logID;	
+		this.guess = gl.guess;
+		this.result = gl.result;
 	}
 	
 	public Integer getId() {
@@ -31,7 +37,5 @@ public class GameLog {
 	public void setResult(ArrayList<Integer> result) {
 		this.result = result;
 	}
-	
-	
 
 }

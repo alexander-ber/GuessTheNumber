@@ -17,8 +17,8 @@ public class GamesServiceImpl implements GamesService {
 	
 	private AtomicInteger gameId = new AtomicInteger(100);
 	private HashMap<Integer, Game> hmap = new HashMap<Integer, Game>();
-	private final Integer maxAttemps = 10; //20
-	private final Integer maxWinners = 5; //10
+	private final Integer maxAttemps = 20; //20
+	private final Integer maxWinners = 10; //10
 	private final String adminPass = "Nimda";
 	
 	public HashMap<Integer, Game> getHmap() {
@@ -91,13 +91,15 @@ public class GamesServiceImpl implements GamesService {
 
 	@Override
 	public Game checkAttempt(Integer gameId, String attempt) {
-		Game g = this.hmap.get(gameId);
+		Game go = this.hmap.get(gameId);
 		
-		if(!g.getIsEnded()) {
+		
+		if(!go.getIsEnded()) {
 			if (attempt.length() != 4) {
+				Game g = new Game(go);
 				return g;
 			}
-			ArrayList<Integer> result = g.checkAttemp(attempt); 
+			ArrayList<Integer> result = go.checkAttemp(attempt); 
 			ArrayList<Integer> winnerResult =  new ArrayList<Integer>(){{add(1);add(1);add(1);add(1);}};
 			
 			if(result.equals(winnerResult)) {
@@ -110,18 +112,19 @@ public class GamesServiceImpl implements GamesService {
 				DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				Date dateobj = new Date();
 				System.out.println(df.format(dateobj));
-				Winners w = new Winners(g.getUserName(), g.getAttempsCounter(), df.format(dateobj).toString());
+				Winners w = new Winners(go.getUserName(), go.getAttempsCounter(), df.format(dateobj).toString());
 				dao.save(w);
-				g.setIsWinner(true);
-				g.setIsEnded(true);
+				go.setIsWinner(true);
+				go.setIsEnded(true);
 			}
 			
-			if(g.getAttempsCounter() == this.maxAttemps) {
-				g.setIsEnded(true);
+			if(go.getAttempsCounter() == this.maxAttemps) {
+				go.setIsEnded(true);
 			}
-			
+			Game g = new Game(go);
 			return g;
 		}
+		Game g = new Game(go);
 		return g;
 	}
 
