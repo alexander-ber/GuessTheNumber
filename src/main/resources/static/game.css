@@ -3,6 +3,10 @@
     box-sizing: border-box;
 }
 
+body{
+    margin: auto;
+    width: 700px;
+}
 table, td, th {
 	border: 1px solid black;
 	border-collapse: collapse;
@@ -49,7 +53,7 @@ input, button {
     padding: 10px;
     margin: 10px;
     float: left;
-    font-size: 12px;
+    font-size: 16px;
 }
 
 .addBtn {
@@ -103,14 +107,14 @@ input, button {
     padding: 5px;
     margin: 10px;
     float: left;
-    font-size: 12px;
+    font-size: 16px;
 }
 #addNameBtn {
     width: 30%;
     padding: 5px;
     margin: 10px;
     float: right;
-    font-size: 12px;
+    font-size: 16px;
     background-color: #61b4c4;
 }
 
@@ -121,14 +125,14 @@ input, button {
 
 #newGame{
 	width: 90%;
-	font-size: 12px;
+	font-size: 16px;
 	padding: 5px;
     margin: 10px;
     background-color: #4326c4;
 }
 #newGame:hover{
 	width: 90%;
-	font-size: 12px;
+	font-size: 16px;
 	padding: 5px;
     margin: 10px;
     color: #4326c4;
@@ -197,7 +201,7 @@ input, button {
 }
 
 .b-popup{
-    margin: 0 auto;
+    margin: 3% auto;
     width: 100%;
     height: 100%;
 }
@@ -213,6 +217,20 @@ input, button {
     flex-direction: column;
     justify-content: center;
 }
+
+.b-popup .b-popup-content2{
+    height: 20%;
+    width: 50%;
+    margin: 10pt auto;
+    padding: 5pt;
+    background-color: #76a6c1f2;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 #winnersTable {
     height: 100%;
     width: 100%;

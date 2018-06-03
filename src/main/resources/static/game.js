@@ -186,7 +186,7 @@ function clearWinnersTable() {
 function showPassInput() {
 	if(!element("showAdminPass")) {
 		element("popup1").innerHTML += 
-			'<div id="showAdminPass" class="b-popup-content"><input type="password" id="password" placeholder="Enter password "><button id="clearWinnersTable" onclick="clearWinnersTable()" class="addBtn">Submit</button></div>';
+			'<div id="showAdminPass" class="b-popup-content2"><input type="password" id="password" placeholder="Enter password "><button id="clearWinnersTable" onclick="clearWinnersTable()" class="addBtn">Submit</button></div>';
 	}
 }
 
@@ -195,7 +195,9 @@ function createWinnersTable() {
 		element("winnersTable").innerHTML = "<h1>No winners found !!</h1>";
 		return;
 	}
-	let t = '<div class="b-popup" id="popup1"> <div class="b-popup-content">' + "<table>";
+	let t = '<div class="b-popup" id="popup1"> <div class="b-popup-content">'
+		+"<h3>Top Score Table</h3>"
+		+ "<table>";
 	t += "<tr>";
 	t += "<th>Name</th>";
 	t += "<th>Attempts</th>";
