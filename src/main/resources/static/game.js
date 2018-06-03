@@ -152,6 +152,7 @@ function getWinnersTable() {
 			log("All events: " + this.responseText);
 			app.winners = JSON.parse(this.responseText);
 			createWinnersTable();
+			element("winnersTable").style['z-index'] = 1;
 		}
 	};
 	xhttp.open("GET", app.baseURL + "/get-winners-table", true);
@@ -185,7 +186,7 @@ function clearWinnersTable() {
 function showPassInput() {
 	if(!element("showAdminPass")) {
 		element("popup1").innerHTML += 
-			'<div id="showAdminPass"><input type="password" id="password" placeholder="Enter password "><button id="clearWinnersTable" onclick="clearWinnersTable()" class="addBtn">Submit</button></div>';
+			'<div id="showAdminPass" class="b-popup-content"><input type="password" id="password" placeholder="Enter password "><button id="clearWinnersTable" onclick="clearWinnersTable()" class="addBtn">Submit</button></div>';
 	}
 }
 
@@ -199,7 +200,6 @@ function createWinnersTable() {
 	t += "<th>Name</th>";
 	t += "<th>Attempts</th>";
 	t += "<th>Date</th>";
-	t += "<th></th>";
 	t += "</tr>";
 	for (let i = 0; i < app.winners.length; i++) {
 		const winner = app.winners[i];
@@ -207,7 +207,6 @@ function createWinnersTable() {
 		t += "<td>" + winner.name + "</td>";
 		t += "<td>" + winner.attempts + "</td>";
 		t += "<td>" + winner.gameDate + "</td>";
-		t += "<td onclick='removeEvent(" + winner.id +")' class='remove'>x</td>";
 		t += "</tr>";
 	}
 	t += "</table>" +
@@ -218,6 +217,7 @@ function createWinnersTable() {
 
 function PopUpHide() {
 	hide(element("popup1"));
+	element("winnersTable").style['z-index'] = -1;
 }
 function removeEvent(eventId) {
 	var xhttp = new XMLHttpRequest();

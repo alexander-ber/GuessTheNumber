@@ -92,6 +92,7 @@ public class GamesServiceImpl implements GamesService {
 	@Override
 	public Game checkAttempt(Integer gameId, String attempt) {
 		Game g = this.hmap.get(gameId);
+		
 		if(!g.getIsEnded()) {
 			if (attempt.length() != 4) {
 				return g;
