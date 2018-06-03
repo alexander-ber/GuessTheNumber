@@ -38,6 +38,7 @@ public class Game {
 	}
 
 	public ArrayList<Integer> checkAttemp(String attemp) {
+		//TODO: unique and isNAN
 		ArrayList<Integer> result = new ArrayList<Integer>();
 		String[] strArray = attemp.split("");
 		for (int i = 0; i < 4; i++) {
