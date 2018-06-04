@@ -50,5 +50,15 @@ public class GamesController {
 	public Boolean clearWinTable(@PathVariable("password") String password) {
 		return services.clearWinTable(password);
 	}	
+
 	
+	@GetMapping(value = "check-attempt2/{gameId}/{attempt}", produces = "application/json") // <--- Add parameter to request
+	public ResponseWrapper checkAttemp2(@PathVariable("gameId") Integer gameId, @PathVariable("attempt") String attempt) {
+		return new ResponseWrapper(services.checkAttempt2(gameId, attempt));
+	}
+	
+//	public ResponseWrapper getAll() {
+//		return new ResponseWrapper(services.fetchAllGames());
+//	}
+//	
 }

@@ -8,4 +8,5 @@ public interface GamesService {
 	Game checkAttempt(Integer gameId, String attemp);
 	Boolean clearWinTable(String password);
 	
+	ResponseWrapper checkAttempt2(Integer gameId, String attemp);
 }

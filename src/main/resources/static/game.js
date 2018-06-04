@@ -32,6 +32,7 @@ function initGame() {
 	element("attempt").disabled = false;
 	element("attempt").value = '';
 	element("attempt").placeholder = "Guess 4-digits number";
+	hide(element("newGame"));
 	
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
@@ -69,26 +70,29 @@ function showName() {
 }
 
 function checkWinner() {
-	if( data.isWinner == true) {
-		alert("Congrats, " + data.userName + "! You are WIN from " + data.attempsCounter + " attemps!");
+	if( data.result.isWinner == true) {
+		alert("Congrats, " + data.userName + "! You are WIN from " + data.result.attempsCounter + " attemps!");
 		element("check").disabled = true;
 		element("attempt").disabled = true;
 		hide(element("check"));
 		element("name").disabled = true;
 		hide(element("addNameBtn"));
 		getWinnersTable();
+		show(element("newGame"));
+		
 	}
 }
 
 function checkMaxAttemps() {
-	if( data.isWinner == false && data.isEnded == true) {
-		alert("Sorry, " + data.userName + ", but you lost! Maximum " + data.attempsCounter + " attemps!");
+	if( data.result.isWinner == false && data.result.isEnded == true) {
+		alert("Sorry, " + data.userName + ", but you lost! Maximum " + data.result.attempsCounter + " attemps!");
 		element("check").disabled = true;
 		element("attempt").disabled = true;
 		hide(element("check"));
 		element("name").disabled = true;
 		hide(element("addNameBtn"));
 		getWinnersTable();
+		show(element("newGame"));
 	}
 }
 
@@ -104,21 +108,31 @@ function checkNumber() {
 			app.attempt++;
 			data = [];
 			data.push(JSON.parse(this.responseText));
-			data = data[0];
-			log("checkNumber Data: " + JSON.stringify(data));
-			log("checkNumber Data gameLog: " + JSON.stringify(data.gameLog));
+			log("checkNumber Data1: " + JSON.stringify(data[0]['result']['userMsg']));
+			data = data[0]['result'];
+
+			if(data.errorMsg != null){
+				alert("Game Server say: - " + data.errorMsg);
+				return;
+			}
+			
 			createLogTable();
 			checkWinner();
 			checkMaxAttemps();
+			
+			if(data.userMsg != null && data.userMsg != '') {
+				alert("Game Server say: - " + data.userMsg);
+			}
+		
 		}
 	};
-	let url = app.baseURL + "/check-attempt/" + app.gameID + "/" + element("attempt").value;
+	let url = app.baseURL + "/check-attempt2/" + app.gameID + "/" + element("attempt").value;
 	xhttp.open("GET", url , true);
 	xhttp.send();
 }
 
 function createLogTable() {
-	var g = data.gameLog;
+	var g = data.result.gameLog;
 	if (g.length == 0) {
 		element("logTable").innerHTML = "<h1>No games found !!</h1>";
 		return;

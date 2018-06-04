@@ -136,5 +136,88 @@ public class GamesServiceImpl implements GamesService {
 		}
 		return false;
 	}
+	
+	protected  boolean uniqueCharacters(String str)  {
+        // If at any time we encounter 2 same
+        // characters, return false
+        for (int i=0; i<str.length(); i++)
+            for (int j=i+1; j<str.length(); j++)
+                if (str.charAt(i) == str.charAt(j))
+                    return false;
+ 
+        // If no duplicate characters encountered,
+        // return true
+        return true;
+    }
+
+	protected boolean validateAttemptString(String attempt) {
+		
+		if (attempt.length() != 4) {
+			return false;
+		}		
+		
+		for(int i = 0; i < attempt.length(); i++) {
+			if (!Character.isDigit(attempt.charAt(i))) {
+				return false;
+			}
+		} 
+		
+		if(!uniqueCharacters(attempt)) {
+			return false;
+		}
+		return true;
+	}
+	
+	@Override
+	public ResponseWrapper checkAttempt2(Integer gameId, String attempt) {
+		Game go = this.hmap.get(gameId);
+		ResponseWrapper rw = new ResponseWrapper();
+	
+		if(!go.getIsEnded()) {
+			
+			if(!validateAttemptString(attempt)) {
+				Game g = new Game(go);
+				rw.setErrorMsg("Error, please enter 4-different-digits number!");
+				rw.setResult(g);
+				return rw;
+			}
+			
+			ArrayList<Integer> result = go.checkAttemp(attempt); 
+			ArrayList<Integer> winnerResult =  new ArrayList<Integer>(){{add(1);add(1);add(1);add(1);}};
+			
+			if(result.equals(winnerResult)) {
+				//check num rows in db, if = maxWinners, delete the bigger attempts user and that add new
+				int count = (int) dao.count();
+				if(count == this.maxWinners) {
+					dao.delete(dao.findFirstByOrderByAttemptsDesc());
+				}
+				// Add new row to DB
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				Date dateobj = new Date();
+				System.out.println(df.format(dateobj));
+				Winners w = new Winners(go.getUserName(), go.getAttempsCounter(), df.format(dateobj).toString());
+				dao.save(w);
+				go.setIsWinner(true);
+				go.setIsEnded(true);
+			}
+			
+			if(go.getAttempsCounter() == this.maxAttemps) {
+				go.setIsEnded(true);
+			}
+			Game g = new Game(go);
+			
+			int attemptsLeft = this.maxAttemps - g.getAttempsCounter();
+			if(attemptsLeft < 4 && attemptsLeft!=0) {
+				rw.setUserMsg("Attention! You have only " + attemptsLeft + " attempts left!");
+			}
+			rw.setResult(g);
+			return rw;
+		}
+		Game g = new Game(go);
+		rw.setErrorMsg("Error! Game ended!");
+		rw.setResult(null);
+		return rw;
+	}
+
 
 }
