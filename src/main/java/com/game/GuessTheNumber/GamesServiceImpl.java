@@ -12,6 +12,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
+
 @Service
 public class GamesServiceImpl implements GamesService {
 	
@@ -112,8 +114,12 @@ public class GamesServiceImpl implements GamesService {
 				DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				Date dateobj = new Date();
 				System.out.println(df.format(dateobj));
-				Winners w = new Winners(go.getUserName(), go.getAttempsCounter(), df.format(dateobj).toString());
-				dao.save(w);
+				Winners w = new Winners(go.getUserName(), go.getAttempsCounter(), df.format(dateobj).toString(), go.getGameLog().toString());
+				try {
+					dao.save(w);
+				} catch(Exception e) {
+					
+				}
 				go.setIsWinner(true);
 				go.setIsEnded(true);
 			}
@@ -195,8 +201,16 @@ public class GamesServiceImpl implements GamesService {
 				DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				Date dateobj = new Date();
 				System.out.println(df.format(dateobj));
-				Winners w = new Winners(go.getUserName(), go.getAttempsCounter(), df.format(dateobj).toString());
-				dao.save(w);
+				String jsonGameLog = new Gson().toJson(go.getGameLog());
+				Winners w = new Winners(go.getUserName(), go.getAttempsCounter(), df.format(dateobj).toString(), jsonGameLog);
+				try {
+					dao.save(w);
+				} catch(Exception e) {
+					Game g = new Game(go);
+					rw.setErrorMsg("DB connection error!");
+					rw.setResult(g);
+					return rw;
+				}
 				go.setIsWinner(true);
 				go.setIsEnded(true);
 			}

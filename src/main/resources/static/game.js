@@ -220,18 +220,84 @@ function createWinnersTable() {
 	t += "</tr>";
 	for (let i = 0; i < app.winners.length; i++) {
 		const winner = app.winners[i];
-		t += "<tr>";
+		winner.log = JSON.parse(winner.log);
+		t += '<tr id = "game_' + i + '" onClick = hideORshow("gameLog_'+i+'") >';
 		t += "<td>" + (i+1) + "</td>";
 		t += "<td>" + winner.name + "</td>";
 		t += "<td>" + winner.attempts + "</td>";
 		t += "<td>" + winner.gameDate + "</td>";
 		t += "</tr>";
+		t += '<tr id="gameLog_' + i + '" class="logHidden" ><td colspan=4>';
+			let log = winner.log;
+			if ( log && log.length != 0) {
+				
+				t += "<table>";
+				t += "<tr>";
+				t += "<th>ID</th>";
+				t += "<th>Guess</th>";
+				t += "<th>Attempt Result</th>";
+				t += "</tr>";
+				for (let i = 0; i < log.length; i++) {
+					t += "<tr>";
+					t += "<td>" + log[i].logID + "</td>";
+					t += "<td>" + log[i].guess.join("") + "</td>";
+					t += "<td>";   
+						for(let j = 0; j < log[i].result.length; j++) {
+							t += '<span id="' +(log[i].result[j] == 0? "yellow":"green")+ '">o</span>'
+						}
+					t += "</td>";
+					t += "</tr>";
+				}
+				t += "</table>";
+			} else {
+				t += "<span>No log found !!</span>";
+			}
+		t += '</td></tr>';
+		//createWinnersLogTable(winner.log, i);
+		
 	}
 	t += "</table>" +
 			'<div id="clear"><a href="javascript:showPassInput()">Clear Table</a> | ';
 	t += '<a href="javascript:PopUpHide()">Close Table</a></div></div></div>';
 	element("winnersTable").innerHTML = t;
 }
+
+function hideORshow(id) {
+    let x = document.getElementById(id);
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+
+function createWinnersLogTable(log, ind) {
+	if (!log || log.length == 0) {
+		element("winnersTable").innerHTML = "<h1>No log found !!</h1>";
+		return;
+	}
+	let t = "<table>";
+	t += "<tr>";
+	t += "<th>ID</th>";
+	t += "<th>Guess</th>";
+	t += "<th>Attempt Result</th>";
+	t += "</tr>";
+	for (let i = 0; i < log.length; i++) {
+		t += "<tr>";
+		t += "<td>" + log[i].id + "</td>";
+		t += "<td>" + log[i].guess.join("") + "</td>";
+		t += "<td>";   
+			for(let j = 0; j < log[i].result.length; j++) {
+				t += '<span id="' +(log[i].result[j] == 0? "yellow":"green")+ '">o</span>'
+			}
+		t += "</td>";
+		t += "</tr>";
+	}
+	t += "</table>";
+	
+	element("gameLog_" + ind).innerHTML = t;
+}
+
 
 function PopUpHide() {
 	hide(element("popup1"));

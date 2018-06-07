@@ -12,16 +12,23 @@ public class Winners {
 	@Id
 	@GeneratedValue
 	private Integer id;
-	
 	private String name;
-	
 	private Integer attempts;
-	
 	@Column(name = "date")
 	private String gameDate;
+	private String log;
 	
+
 	public Integer getAttempts() {
 		return attempts;
+	}
+
+	public String getLog() {
+		return log;
+	}
+
+	public void setLog(String log) {
+		this.log = log;
 	}
 
 	public void setAttempts(Integer attempts) {
@@ -32,11 +39,12 @@ public class Winners {
 		super();
 	}
 
-	public Winners(String name, Integer attempts, String gameDate) {
+	public Winners(String name, Integer attempts, String gameDate, String log) {
 		super();
 		this.name = name;
 		this.gameDate = gameDate;
 		this.attempts = attempts;
+		this.log = log;
 	}
 
 	public Integer getId() {
