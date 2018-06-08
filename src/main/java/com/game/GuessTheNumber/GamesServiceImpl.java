@@ -35,8 +35,16 @@ public class GamesServiceImpl implements GamesService {
 	private GamesRepository dao;
 	
 	@Override
-	public Iterable<Winners> getWinnersTable() {
-		return dao.findTop10ByOrderByAttemptsAsc();
+	public ResponseWrapper getWinnersTable() {
+		Iterable<Winners> winnersTable;
+		ResponseWrapper rw = new ResponseWrapper();
+		try {
+			winnersTable = dao.findTop10ByOrderByAttemptsAsc();
+			rw.setResult(winnersTable);
+		} catch(Exception e) {
+			rw.setErrorMsg("DB connection error! ( Error" + e + " )");
+		}
+		return rw;
 	}
 	
 	@Override 
@@ -44,8 +52,11 @@ public class GamesServiceImpl implements GamesService {
 		
 		Integer uniqueId = this.gameId.getAndIncrement();		
 		ArrayList<Integer> arl = this.generateSecretNumber();
+		Game ng = new Game(uniqueId, arl, "Anonymous");
+
+		this.hmap.put(uniqueId, ng);
 		
-		this.hmap.put(uniqueId, new Game(uniqueId, arl, "Anonymous"));
+		System.out.println("Log: getNewGameId: " + ng.toString());
 		
 		return uniqueId;
 	}
@@ -62,97 +73,51 @@ public class GamesServiceImpl implements GamesService {
 		return arl;
 	}
 	
+	//For Ameed only
 	@Override
 	public Game getGameDetails(Integer gameId) {
 		return this.hmap.get(gameId);
-	}
-
-	protected boolean updateCounter(Integer gameId) {		
-		Game g = this.hmap.get(gameId);
-		Integer attempsCounter = g.getAttempsCounter();
-		attempsCounter++;
-		
-		if(attempsCounter == this.maxAttemps) {
-			g.setIsEnded(true);
-			return false;
-		}
-		
-		g.setAttempsCounter(attempsCounter);
-		this.hmap.put(gameId, g);
-		return true;
 	}
 
 	@Override
 	public Boolean setGamerName(Integer gameId, String name) {
 		Game g = this.hmap.get(gameId);
 		g.setUserName(name);
-		this.hmap.put(gameId, g);
-		
+		try {
+			this.hmap.put(gameId, g);
+		} catch (Exception e) {
+			return false;
+		}
+		System.out.println("Log: setGamerName: " + g.toString());
 		return true;
 	}
 
 	@Override
-	public Game checkAttempt(Integer gameId, String attempt) {
-		Game go = this.hmap.get(gameId);
-		
-		
-		if(!go.getIsEnded()) {
-			if (attempt.length() != 4) {
-				Game g = new Game(go);
-				return g;
-			}
-			ArrayList<Integer> result = go.checkAttemp(attempt); 
-			ArrayList<Integer> winnerResult =  new ArrayList<Integer>(){{add(1);add(1);add(1);add(1);}};
-			
-			if(result.equals(winnerResult)) {
-				//check num rows in db, if = maxWinners, delete the bigger attempts user and that add new
-				int count = (int) dao.count();
-				if(count == this.maxWinners) {
-					dao.delete(dao.findFirstByOrderByAttemptsDesc());
-				}
-				// Add new row to DB
-				DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				Date dateobj = new Date();
-				System.out.println(df.format(dateobj));
-				Winners w = new Winners(go.getUserName(), go.getAttempsCounter(), df.format(dateobj).toString(), go.getGameLog().toString());
-				try {
-					dao.save(w);
-				} catch(Exception e) {
-					
-				}
-				go.setIsWinner(true);
-				go.setIsEnded(true);
-			}
-			
-			if(go.getAttempsCounter() == this.maxAttemps) {
-				go.setIsEnded(true);
-			}
-			Game g = new Game(go);
-			return g;
-		}
-		Game g = new Game(go);
-		return g;
-	}
-
-	@Override
 	public Boolean clearWinTable(String password) {
+
 		if(password.equals(this.adminPass)) {
-			dao.deleteAll();
+			try {
+				dao.deleteAll();
+			} catch (Exception e) {
+				return false;
+			}
+			System.out.println("Log: clearWinTable - cleared! ");
 			return true;
 		}
+		System.out.println("Log: clearWinTable with password: " + password + " - bad pass!");
 		return false;
 	}
 	
-	protected  boolean uniqueCharacters(String str)  {
-        // If at any time we encounter 2 same
-        // characters, return false
-        for (int i=0; i<str.length(); i++)
-            for (int j=i+1; j<str.length(); j++)
-                if (str.charAt(i) == str.charAt(j))
+	protected boolean uniqueCharacters(String str)  {
+        
+		//Check for unique characters in string array
+        for (int i=0; i<str.length(); i++) {
+            for (int j=i+1; j<str.length(); j++) {
+                if (str.charAt(i) == str.charAt(j)) {
                     return false;
- 
-        // If no duplicate characters encountered,
-        // return true
+                }
+            }
+        }    
         return true;
     }
 
@@ -175,10 +140,13 @@ public class GamesServiceImpl implements GamesService {
 	}
 	
 	@Override
-	public ResponseWrapper checkAttempt2(Integer gameId, String attempt) {
+	public ResponseWrapper checkAttempt(Integer gameId, String attempt) {
+		//Get game object
 		Game go = this.hmap.get(gameId);
 		ResponseWrapper rw = new ResponseWrapper();
-	
+		
+		System.out.println("Log: checkAttempt: Attempt = [" + attempt + "], game object: " + go.toString());
+				
 		if(!go.getIsEnded()) {
 			
 			if(!validateAttemptString(attempt)) {
@@ -203,19 +171,21 @@ public class GamesServiceImpl implements GamesService {
 				System.out.println(df.format(dateobj));
 				String jsonGameLog = new Gson().toJson(go.getGameLog());
 				Winners w = new Winners(go.getUserName(), go.getAttempsCounter(), df.format(dateobj).toString(), jsonGameLog);
+				
+				go.setIsWinner(true);
+				go.setIsEnded(true);
+				
 				try {
 					dao.save(w);
 				} catch(Exception e) {
 					Game g = new Game(go);
-					rw.setErrorMsg("DB connection error!");
+					rw.setErrorMsg("DB connection error! ( Error" + e + " )");
 					rw.setResult(g);
 					return rw;
 				}
-				go.setIsWinner(true);
-				go.setIsEnded(true);
 			}
 			
-			if(go.getAttempsCounter() == this.maxAttemps) {
+			if(go.getAttempsCounter() == this.maxAttemps || go.getIsWinner()) {
 				go.setIsEnded(true);
 			}
 			Game g = new Game(go);
@@ -227,6 +197,7 @@ public class GamesServiceImpl implements GamesService {
 			rw.setResult(g);
 			return rw;
 		}
+		
 		Game g = new Game(go);
 		rw.setErrorMsg("Error! Game ended!");
 		rw.setResult(null);

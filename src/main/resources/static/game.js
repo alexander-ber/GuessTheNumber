@@ -8,7 +8,13 @@ const app = {
 let data = [];
 
 function initGame() {
-	
+	element('attempt').addEventListener("keyup", function(event) {
+		event.preventDefault();
+		if (event.keyCode === 13) {
+		    document.getElementById("check").click();
+		    event.keyCode = null;
+		}
+	});
 
 	if(app.gameID != null) {
 		if (!confirm("Start new game?")) {
@@ -71,7 +77,7 @@ function showName() {
 
 function checkWinner() {
 	if( data.result.isWinner == true) {
-		alert("Congrats, " + data.userName + "! You are WIN from " + data.result.attempsCounter + " attemps!");
+		alert("Congrats, " + data.result.userName + "! You are WIN from " + data.result.attempsCounter + " attemps!");
 		element("check").disabled = true;
 		element("attempt").disabled = true;
 		hide(element("check"));
@@ -96,6 +102,7 @@ function checkMaxAttemps() {
 	}
 }
 
+//Get wrapped game object each time.
 function checkNumber() {
 	if(element("attempt").value.length != 4 ) {
 		alert("Enter 4 digits number! Not a " + element("attempt").value.length + " digits!");
@@ -108,7 +115,6 @@ function checkNumber() {
 			app.attempt++;
 			data = [];
 			data.push(JSON.parse(this.responseText));
-			log("checkNumber Data1: " + JSON.stringify(data[0]['result']['userMsg']));
 			data = data[0]['result'];
 
 			if(data.errorMsg != null){
@@ -124,9 +130,13 @@ function checkNumber() {
 				alert("Game Server say: - " + data.userMsg);
 			}
 		
+		} else if (this.readyState == 4 && this.status != 200) {
+			let r = JSON.parse(this.responseText);
+			alert("Game Server Error: - Status: " + this.status + ", error: "+ r.error + ", \n message: " + r.message);
 		}
 	};
-	let url = app.baseURL + "/check-attempt2/" + app.gameID + "/" + element("attempt").value;
+	
+	let url = app.baseURL + "/check-attempt/" + app.gameID + "/" + element("attempt").value;
 	xhttp.open("GET", url , true);
 	xhttp.send();
 }
@@ -158,13 +168,21 @@ function createLogTable() {
 	element("logTable").innerHTML = t;
 }
 
-
 function getWinnersTable() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
-			log("All events: " + this.responseText);
-			app.winners = JSON.parse(this.responseText);
+			
+			data = [];
+			data.push(JSON.parse(this.responseText));
+			
+			if(data.errorMsg != null){
+				alert("Game Server say: - " + data.errorMsg);
+				return;
+			}
+			
+			data = data[0]['result'];
+			app.winners = data;
 			createWinnersTable();
 			element("winnersTable").style['z-index'] = 1;
 		}
@@ -186,10 +204,10 @@ function clearWinnersTable() {
 				element("winnersTable").innerHTML = "";
 				app.winners = [];
 				alert("Winners table is cleared!");
+				initGame();
 			} else {
 				alert("Wrong password!!");
 			}
-			createWinnersTable();
 		}
 	};
 	let url = app.baseURL + "/clear-win-table/" + element("password").value;
@@ -199,8 +217,11 @@ function clearWinnersTable() {
 
 function showPassInput() {
 	if(!element("showAdminPass")) {
+		//let t = '<div class="modal" id="popup1"><div class="modal-content"><span class="close" onClick="PopUpHide()">&times;</span>'
 		element("popup1").innerHTML += 
-			'<div id="showAdminPass" class="b-popup-content2"><input type="password" id="password" placeholder="Enter password "><button id="clearWinnersTable" onclick="clearWinnersTable()" class="addBtn">Submit</button></div>';
+			'<div id="showAdminPass" class="modal-content2"><span class="close" onClick=hideORshow("showAdminPass")>&times;</span><input type="password" id="password" placeholder="Enter password "><button id="clearWinnersTable" onclick="clearWinnersTable()" class="addBtn">Submit</button></div>';
+	} else {
+		hideORshow("showAdminPass");
 	}
 }
 
@@ -209,8 +230,8 @@ function createWinnersTable() {
 		element("winnersTable").innerHTML = "<h1>No winners found !!</h1>";
 		return;
 	}
-	let t = '<div class="b-popup" id="popup1"> <div class="b-popup-content">'
-		+"<h3>Top Score Table</h3>"
+	let t = '<div class="modal" id="popup1"><div class="modal-content"><span class="close" onClick="PopUpHide()">&times;</span>'
+		+'<h3>Top Score Table</h3> '
 		+ "<table>";
 	t += "<tr>";
 	t += "<th>#</th>";
@@ -218,42 +239,45 @@ function createWinnersTable() {
 	t += "<th>Attempts</th>";
 	t += "<th>Date</th>";
 	t += "</tr>";
+	
 	for (let i = 0; i < app.winners.length; i++) {
 		const winner = app.winners[i];
 		winner.log = JSON.parse(winner.log);
-		t += '<tr id = "game_' + i + '" onClick = hideORshow("gameLog_'+i+'") >';
+		t += '<tr id = "game_' + i + '" onClick = hideORshow("gameLog_'+i+'") title="Click to show game log" class="pointer">';
 		t += "<td>" + (i+1) + "</td>";
 		t += "<td>" + winner.name + "</td>";
 		t += "<td>" + winner.attempts + "</td>";
 		t += "<td>" + winner.gameDate + "</td>";
 		t += "</tr>";
-		t += '<tr id="gameLog_' + i + '" class="logHidden" ><td colspan=4>';
+		t += '<tr id="gameLog_' + i + '" class="logHidden" ><td colspan="4">';
+		
 			let log = winner.log;
 			if ( log && log.length != 0) {
 				
 				t += "<table>";
 				t += "<tr>";
-				t += "<th>ID</th>";
-				t += "<th>Guess</th>";
-				t += "<th>Attempt Result</th>";
+					t += "<th>ID</th>";
+					t += "<th>Guess</th>";
+					t += "<th>Attempt Result</th>";
 				t += "</tr>";
+				//create game log 
 				for (let i = 0; i < log.length; i++) {
 					t += "<tr>";
-					t += "<td>" + log[i].logID + "</td>";
-					t += "<td>" + log[i].guess.join("") + "</td>";
-					t += "<td>";   
-						for(let j = 0; j < log[i].result.length; j++) {
-							t += '<span id="' +(log[i].result[j] == 0? "yellow":"green")+ '">o</span>'
-						}
-					t += "</td>";
+						t += "<td>" + log[i].logID + "</td>";
+						t += "<td>" + log[i].guess.join("") + "</td>";
+						t += "<td>";   
+							for(let j = 0; j < log[i].result.length; j++) {
+								t += '<span id="' +(log[i].result[j] == 0? "yellow":"green")+ '">o</span>'
+							}
+						t += "</td>";
 					t += "</tr>";
 				}
 				t += "</table>";
 			} else {
-				t += "<span>No log found !!</span>";
+				t += '<td><span>No game log found !!</span></td>';
 			}
+			
 		t += '</td></tr>';
-		//createWinnersLogTable(winner.log, i);
 		
 	}
 	t += "</table>" +
@@ -264,83 +288,21 @@ function createWinnersTable() {
 
 function hideORshow(id) {
     let x = document.getElementById(id);
-    if (x.style.display === "none") {
+    if (x.style.display != "block") {
         x.style.display = "block";
     } else {
         x.style.display = "none";
     }
 }
 
-function createWinnersLogTable(log, ind) {
-	if (!log || log.length == 0) {
-		element("winnersTable").innerHTML = "<h1>No log found !!</h1>";
-		return;
-	}
-	let t = "<table>";
-	t += "<tr>";
-	t += "<th>ID</th>";
-	t += "<th>Guess</th>";
-	t += "<th>Attempt Result</th>";
-	t += "</tr>";
-	for (let i = 0; i < log.length; i++) {
-		t += "<tr>";
-		t += "<td>" + log[i].id + "</td>";
-		t += "<td>" + log[i].guess.join("") + "</td>";
-		t += "<td>";   
-			for(let j = 0; j < log[i].result.length; j++) {
-				t += '<span id="' +(log[i].result[j] == 0? "yellow":"green")+ '">o</span>'
-			}
-		t += "</td>";
-		t += "</tr>";
-	}
-	t += "</table>";
-	
-	element("gameLog_" + ind).innerHTML = t;
-}
-
-
 function PopUpHide() {
-	hide(element("popup1"));
+	//hide(element("popup1"));
+	element("popup1").style.display = "none";
 	element("winnersTable").style['z-index'] = -1;
 }
-function removeEvent(eventId) {
-	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function() {
-		if (this.readyState == 4 && this.status == 200) {
-			log("deleted event: " + this.responseText);
-			showAllEvents();
-		}
-	};
-	xhttp.open("DELETE", app.baseURL + "/" + eventId, true);
-	xhttp.send();
-	
-}
 
-function addEvent() {
-	hide(element('addEventBtn'));
-
-	const event = {
-		description : element("description").value,
-		startDate : element("startDate").value
-	}
-	if (event.description == null || event.description.length == 0
-			|| event.startDate == null || event.startDate.length == 0) {
-		alert("Please fill all the fileds");
-		show(element('addEventBtn'));
-		return;
-	}
-
-	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function() {
-		if (this.readyState == 4 && this.status == 200) {
-			log("new id is " + this.responseText);
-			showAllEvents();
-		}
-	};
-	xhttp.open("POST", app.baseURL, true);
-	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.send(JSON.stringify(event));
-	show(element('addEventBtn'));
+function passHide() {
+	element("showAdminPass").style.display = "none";
 }
 
 function hide(element) {
@@ -362,3 +324,7 @@ function element(elementId) {
 function log(item) {
 	console.log(item);
 }
+
+
+
+

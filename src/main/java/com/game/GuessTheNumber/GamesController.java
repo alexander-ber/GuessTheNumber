@@ -15,7 +15,7 @@ public class GamesController {
 	private GamesService services;
 
 	@GetMapping("get-winners-table")
-	public Iterable<Winners> getWinnersTable() {
+	public ResponseWrapper getWinnersTable() {
 		return services.getWinnersTable();
 	}
 	
@@ -24,41 +24,24 @@ public class GamesController {
 		return services.getNewGameId();
 	}
 	
-	@GetMapping(value = "get-game-details2/{gameId}",  produces = "application/json") // <--- Add parameter to request
+	@GetMapping(value = "get-game-details/{gameId}",  produces = "application/json")
 	public Game getGameDetails2(@PathVariable("gameId") Integer gameId) {
 		return services.getGameDetails(gameId);
-		//return services.getGameDetails(gameId);
 	}	
 	
-	@GetMapping(value = "get-game-details/{gameId}",  produces = "application/json") // <--- Add parameter to request
-	public Object getGameDetails(@PathVariable("gameId") Integer gameId) {
-		return services.getGameDetails(gameId).toString();
-		//return services.getGameDetails(gameId);
-	}	
-	
-	@PostMapping("set-gamer-name/{gameId}/{name}") // <--- Add parameter to request
+	@PostMapping("set-gamer-name/{gameId}/{name}")
 	public Boolean setGamerName(@PathVariable("gameId") Integer gameId, @PathVariable("name") String name) {
 		return services.setGamerName(gameId, name);
 	}	
 
-	@GetMapping(value = "check-attempt/{gameId}/{attempt}", produces = "application/json") // <--- Add parameter to request
-	public Game checkAttemp(@PathVariable("gameId") Integer gameId, @PathVariable("attempt") String attempt) {
-		return services.checkAttempt(gameId, attempt);
-	}
-	
-	@PostMapping(value = "clear-win-table/{password}",  produces = "application/json") // <--- Add parameter to request
+	@PostMapping(value = "clear-win-table/{password}",  produces = "application/json")
 	public Boolean clearWinTable(@PathVariable("password") String password) {
 		return services.clearWinTable(password);
 	}	
 
-	
-	@GetMapping(value = "check-attempt2/{gameId}/{attempt}", produces = "application/json") // <--- Add parameter to request
+	@GetMapping(value = "check-attempt/{gameId}/{attempt}", produces = "application/json")
 	public ResponseWrapper checkAttemp2(@PathVariable("gameId") Integer gameId, @PathVariable("attempt") String attempt) {
-		return new ResponseWrapper(services.checkAttempt2(gameId, attempt));
+		return new ResponseWrapper(services.checkAttempt(gameId, attempt));
 	}
 	
-//	public ResponseWrapper getAll() {
-//		return new ResponseWrapper(services.fetchAllGames());
-//	}
-//	
 }
